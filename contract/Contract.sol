@@ -12,14 +12,9 @@ contract local {
         address inspector;
         string place;
         string timeDate;
-        string crimeAct; //these details of crime name will  be fetched from api
-        string crimeSection;
+        string crimeSection; //these details of crime name will  be fetched from api
         string crimeDescription;
-        string victimName;
-        uint256 victimAge;
-        string victimGender;
-        bool victimAliveDead;  // false = dead
-        string victimPhoto;
+        string victimId;
         string victimAadharNumber;
         string[] witnessName; 
         string[] witnessAadharNumber;
@@ -51,13 +46,8 @@ contract local {
     function registerFIR(
         string memory _place,
         string memory _timeDate,
-        string memory _crimeAct,
         string memory _crimeSection,
-        string memory _victimName,
-        uint256 _victimAge,
-        string memory _victimGender,
-        bool _victimAliveDead,
-        string memory _victimPhoto,
+        string memory _victimId,
         string memory _victimAadharNumber,
         string memory _witnessName,
         string memory _witnessAadharNumber,
@@ -70,13 +60,8 @@ contract local {
         newCase.inspector = msg.sender;
         newCase.place = _place;
         newCase.timeDate = _timeDate;
-        newCase.crimeAct = _crimeAct;
         newCase.crimeSection = _crimeSection;
-        newCase.victimName = _victimName;
-        newCase.victimAge = _victimAge;
-        newCase.victimGender = _victimGender;
-        newCase.victimAliveDead = _victimAliveDead;
-        newCase.victimPhoto = _victimPhoto;
+        newCase.victimId = _victimId;
         newCase.victimAadharNumber = _victimAadharNumber;
         newCase.witnessName.push(_witnessName);
         newCase.witnessAadharNumber.push(_witnessAadharNumber);
@@ -96,12 +81,8 @@ contract local {
     function addWitness(uint256 caseId, string memory _witnessName, string memory _witnessAadharNumber) 
         public onlyInspector(caseId) 
     {
-        Case storage currentCase = cases[caseId];   //nthCase=caseId only ha 
-        require(!currentCase.isClosed, "Cannot add witness to a closed case");
-
-        currentCase.witnessName.push(_witnessName);
-        currentCase.witnessAadharNumber.push(_witnessAadharNumber);
-
+        cases[caseId].witnessName.push(_witnessName);  //nthCase=caseId only ha 
+        cases[caseId].witnessAadharNumber.push(_witnessAadharNumber);
         emit WitnessAdded(caseId, _witnessName, _witnessAadharNumber);
     }
 
@@ -111,25 +92,25 @@ contract local {
         string memory _evidenceImages,
         string memory _evidenceVideos
     ) public onlyInspector(caseId) {
-        Case storage currentCase = cases[caseId];
-        require(!currentCase.isClosed, "Cannot add evidence to a closed case");
 
-        currentCase.evidenceDescriptions.push(_evidenceDescriptions);
-        currentCase.evidenceImages.push(_evidenceImages);
-        currentCase.evidenceVideos.push(_evidenceVideos);
+        cases[caseId].evidenceDescriptions.push(_evidenceDescriptions);
+        cases[caseId].evidenceImages.push(_evidenceImages);
+        cases[caseId].evidenceVideos.push(_evidenceVideos);
 
         emit EvidenceAdded(caseId, _evidenceDescriptions);
     }
 
     function closeCase(uint256 caseId) public onlyInspector(caseId) {
-        Case storage currentCase = cases[caseId];
-        require(!currentCase.isClosed, "Case is already closed");
-
-        currentCase.isClosed = true;
+       
+        cases[caseId].isClosed = true;
         emit CaseClosed(caseId);
     }
 
     function getInspectorCases() public view returns (uint256[] memory) {
         return inspectorCases[msg.sender];
+    }
+
+    function getCase(uint caseId) public view returns(Case memory){
+        return cases[caseId];
     }
 }
