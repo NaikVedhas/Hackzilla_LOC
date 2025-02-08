@@ -13,13 +13,13 @@ app.use(cors({
 app.use(express.json({limit:"5mb"}));
 app.use("/api/v1/fir",router)
 
-mongoose.connect(process.env.MONGODBURI)
-.then(()=>{
+// mongoose.connect(process.env.MONGODBURI)
+// .then(()=>{
     app.listen(5000,()=>{
         console.log("MongoDb connected and server running on port 5000 ");
     })
-})
-.catch((err)=>console.log("error in mongo- ",err));
+// })
+// .catch((err)=>console.log("error in mongo- ",err));
 
     
     

@@ -1,5 +1,5 @@
 const express = require('express');
-const {fileFir} = require('../controllers/FirController');
+const {fileFir,upload} = require('../controllers/FirController');
 
 const router = express.Router();
 
