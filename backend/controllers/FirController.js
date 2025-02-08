@@ -4,123 +4,156 @@ const FormData = require("form-data");
 const fs = require("fs");
 const Victim = require("../models/VictimModel");
 const Evidence = require("../models/EvidenceModel");
+const { log } = require("console");
 
 require("dotenv").config();
 
+// Set up storage for multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/"); // Save uploads in the "uploads" folder
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
+    cb(null, Date.now() + "-" + file.originalname); // Add a unique timestamp to the filename
   },
 });
 
-const upload = multer({ storage: storage });
+// Initialize multer upload handler
+const upload = multer({
+  storage: storage
+  // Additional options like file size limits or file types can be added here
+}).fields([
+  { name: "profilePicture", maxCount: 1 },
+  { name: "evidenceImages", maxCount: 10 },
+  { name: "evidenceVideos", maxCount: 5 },
+]);
 
+// Upload file to IPFS using Pinata
+const uploadToIPFS = async (file) => {
+  const formData = new FormData();
+  formData.append("file", fs.createReadStream(file.path));
+  formData.append("pinataMetadata", JSON.stringify({ name: file.originalname }));
+  formData.append("pinataOptions", JSON.stringify({ cidVersion: 0 }));
 
-const uploadToIpfs = () =>{
+  try {
+    const response = await axios.post(
+      "https://api.pinata.cloud/pinning/pinFileToIPFS",
+      formData,
+      {
+        headers: {
+          ...formData.getHeaders(),
+          pinata_api_key: process.env.PINATA_API_KEY,
+          pinata_secret_api_key: process.env.PINATA_SECRET_API_KEY,
+        },
+      }
+    );
+    return response.data.IpfsHash;
+  } catch (error) {
+    console.log("Error uploading to IPFS:", error.message);
+    throw new Error("Error uploading to IPFS");
+  }
+};
 
-}
-
-
-
+// Main function to handle file upload for FIR
 const fileFir = async (req, res) => {
   try {
-    // Ensure file is uploaded
-    const {descriptionOfCrime,place,crimeSection,dateTime,victimName,victimGender,victimAge,witnessName} = req.body;
-  
-    let ipfsVictimHash;
-    let ipfsEvidenceImageHash;
-    let ipfsEvidenceVideoHash;
+    // Destructure body data
+    const { descriptionOfCrime, place, crimeSection, dateTime, victimName, victimGender, victimAge, witnessName, victimAadharCardNo, witnessAadharCardNo } = req.body;
     
+    let ipfsVictimHash;
+    let ipfsEvidenceImageHash = [];
+    let ipfsEvidenceVideoHash = [];
+  
     let victimDocId;
     let evidenceImageDocId;
     let evidenceVideoDocId;
 
-    if (!req.file) {
-      return res.status(400).json({ message: "Image file is required" });
+    // Ensure victim profile image is uploaded
+    if (!req.files || !req.files.profilePicture) {
+      return res.status(400).json({ message: "Profile picture is required" });
     }
-
-    try {
-      // Upload image to IPFS using Pinata
-      const formData = new FormData();
-      formData.append("file", fs.createReadStream(req.file.path));
-  
-      formData.append(
-        "pinataMetadata",
-        JSON.stringify({ name: req.file.originalname })
-      );
-      formData.append("pinataOptions", JSON.stringify({ cidVersion: 0 }));
-  
-      const pinataResponse = await axios.post(
-        "https://api.pinata.cloud/pinning/pinFileToIPFS",
-        formData,
-        {
-          headers: {
-            ...formData.getHeaders(),
-            pinata_api_key: process.env.PINATA_API_KEY, 
-            pinata_secret_api_key: process.env.PINATA_SECRET_API_KEY,
-          },
-        }
-      );
-  
-      ipfsVictimHash = pinataResponse.data.IpfsHash;
-      
-
-      
-
-    } catch (error) {
-        console.log("Error in Ipfs",error.message);
-        return res.status(500).json({message:"Server Error bro"})
-    }
+    console.log("REACHED 1 ");
     
-
+    // Upload victim profile image to IPFS
     try {
-      //Send to mongodb
+      ipfsVictimHash = await uploadToIPFS(req.files.profilePicture[0]);
+    } catch (error) {
+      return res.status(500).json({ message: "Error uploading victim profile image to IPFS" });
+    }
+
+    // Upload evidence images to IPFS (if any)
+    if (req.files && req.files.evidenceImages) {
+      try {
+        // Iterate over each evidence image file and upload one by one
+        for (let file of req.files.evidenceImages) {
+          const ipfsHash = await uploadToIPFS(file);
+          ipfsEvidenceImageHash.push(ipfsHash);
+
+          // Save each image's IPFS hash to the Evidence collection one by one
+          await Evidence.create({ hash: ipfsHash });
+        }
+      } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Error uploading evidence images to IPFS" });
+      }
+    }
+    console.log("REACHED 2 ");
+
+    // Upload evidence videos to IPFS (if any)
+    if (req.files && req.files.evidenceVideos) {
+      try {
+        // Iterate over each evidence video file and upload one by one
+        for (let file of req.files.evidenceVideos) {
+          const ipfsHash = await uploadToIPFS(file);
+          ipfsEvidenceVideoHash.push(ipfsHash);
+
+          // Save each video's IPFS hash to the Evidence collection one by one
+          await Evidence.create({ hash: ipfsHash });
+        }
+      } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Error uploading evidence videos to IPFS" });
+      }
+    }
+    console.log("REACHED 3 ");
+
+    // Send the data to MongoDB for victim information
+    try {
+      console.log(descriptionOfCrime, place, crimeSection, dateTime, victimName, victimGender, victimAge, witnessName, victimAadharCardNo, witnessAadharCardNo);
+
       const victim = await Victim.create({
-        name:victimName,
-        gender:victimGender,
-        age:victimAge,
-        aadharCardNo:victimAadharCardNo,
-        profilePictureHash:ipfsVictimHash
-      })
+        name: victimName,
+        gender: victimGender,
+        age: victimAge,
+        aadharCardNo: victimAadharCardNo,
+        profilePictureHash: ipfsVictimHash,
+      });
 
       victimDocId = victim._id;
-
-      if(ipfsEvidenceImageHash){
-        evidenceImageDocId = await Evidence.create({hash:ipfsEvidenceImageHash});
-      }
-
-      if(ipfsEvidenceVideoHash){
-        evidenceVideoDocId = await Evidence.create({hash:ipfsEvidenceVideoHash});
-
-      }
-
     } catch (error) {
-      console.log("Error in MongoDb",error.message);
-      return res.status(500).json({message:"Server Error bro"})
-    }
-    
-
-    try {
-      //Send data to blockchain
-
-      
-
-    } catch (error) {
-      
+      console.log("Error in MongoDB:", error.message);
+      return res.status(500).json({ message: "Server Error when saving to MongoDB" });
     }
 
-
-
+    console.log("DONE SUCCESS");
     
-
-
-    res.status(200).json({ message: "Report successfully submitted"});
+    // Send a success response with the collected data
+    res.status(200).json({
+      ipfsVictimHash,
+      ipfsEvidenceImageHash,
+      ipfsEvidenceVideoHash,
+      victimDocId,
+      place,
+      crimeSection,
+      descriptionOfCrime,
+      dateTime,
+      victimAadharCardNo,
+      witnessName,
+      witnessAadharCardNo,
+    });
   } catch (error) {
-    console.log("Error in fileFir", error);
-    return res.status(500).json({ message: "Server Error bro" });
+    console.log("Error in fileFir:", error);
+    return res.status(500).json({ message: "Server Error" });
   }
 };
 

@@ -3,7 +3,7 @@ const {fileFir,upload} = require('../controllers/FirController');
 
 const router = express.Router();
 
-router.post("/file",upload.single("image"),fileFir);
+router.post("/file",upload,fileFir);
 
 
 module.exports = router;
