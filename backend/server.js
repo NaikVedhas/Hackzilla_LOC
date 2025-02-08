@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();    
 const cors = require('cors')
+const router = require('./routes/FirRoutes');
 
 const app = express();
 
@@ -10,7 +11,7 @@ app.use(cors({
 }))
 
 app.use(express.json({limit:"5mb"}));
-
+app.use("/api/v1/fir",router)
 
 mongoose.connect(process.env.MONGODBURI)
 .then(()=>{

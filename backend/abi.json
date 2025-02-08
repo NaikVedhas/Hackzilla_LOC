@@ -1,0 +1,419 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "caseId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_evidenceDescriptions",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_evidenceImages",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_evidenceVideos",
+				"type": "string"
+			}
+		],
+		"name": "addEvidence",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "caseId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_witnessName",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_witnessAadharNumber",
+				"type": "string"
+			}
+		],
+		"name": "addWitness",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "caseId",
+				"type": "uint256"
+			}
+		],
+		"name": "closeCase",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_place",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_timeDate",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_crimeSection",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_victimId",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_victimAadharNumber",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_witnessName",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_witnessAadharNumber",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_evidenceImages",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_evidenceDescriptions",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_evidenceVideos",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_crimeDescription",
+				"type": "string"
+			}
+		],
+		"name": "registerFIR",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "caseId",
+				"type": "uint256"
+			}
+		],
+		"name": "CaseClosed",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "caseId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "evidenceDescriptions",
+				"type": "string"
+			}
+		],
+		"name": "EvidenceAdded",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "caseId",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "inspector",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "place",
+				"type": "string"
+			}
+		],
+		"name": "FIRRegistered",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "caseId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "witnessName",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "witnessAadharNumber",
+				"type": "string"
+			}
+		],
+		"name": "WitnessAdded",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "cases",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "inspector",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "place",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "timeDate",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "crimeSection",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "crimeDescription",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "victimId",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "victimAadharNumber",
+				"type": "string"
+			},
+			{
+				"internalType": "bool",
+				"name": "isClosed",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "caseId",
+				"type": "uint256"
+			}
+		],
+		"name": "getCase",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "address",
+						"name": "inspector",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "place",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "timeDate",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "crimeSection",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "crimeDescription",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "victimId",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "victimAadharNumber",
+						"type": "string"
+					},
+					{
+						"internalType": "string[]",
+						"name": "witnessName",
+						"type": "string[]"
+					},
+					{
+						"internalType": "string[]",
+						"name": "witnessAadharNumber",
+						"type": "string[]"
+					},
+					{
+						"internalType": "string[]",
+						"name": "evidenceImages",
+						"type": "string[]"
+					},
+					{
+						"internalType": "string[]",
+						"name": "evidenceDescriptions",
+						"type": "string[]"
+					},
+					{
+						"internalType": "string[]",
+						"name": "evidenceVideos",
+						"type": "string[]"
+					},
+					{
+						"internalType": "bool",
+						"name": "isClosed",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct local.Case",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getInspectorCases",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "inspectorCases",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "nthCase",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
