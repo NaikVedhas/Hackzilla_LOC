@@ -4,10 +4,6 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useAccount } from 'wagmi';
 import { ethers } from 'ethers';
-// import { useSigner } from 'wagmi'; // Import the useSigner hook
-// import contractAddress from ""
-
-// import abi from ""
 
 import contractABI from "../abi.json";
 import contractAddress from "../contractAddress";

@@ -19,25 +19,6 @@ const config = getDefaultConfig({
 
 const chains = [sepolia, mainnet, polygon];
 
-// // Configure chains
-// const { chains, publicClient } = configureChains(
-//   [mainnet, polygon, arbitrum, optimism],
-//   [publicProvider()]
-// );
-
-// // Get default wallets
-// const { connectors } = getDefaultWallets({
-//   appName: "loc7",
-//   projectId: "59738a3aed3d161d34bda195475becbe", // WalletConnect Project ID
-//   chains,
-// });
-
-// // Create Wagmi config
-// const wagmiConfig = createConfig({
-//   autoConnect: true,
-//   connectors,
-//   publicClient,
-// });
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
