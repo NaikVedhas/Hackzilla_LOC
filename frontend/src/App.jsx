@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import './App.css'
-// import CrimeForm from "./components/Form"
 import Fir from './components/fir'
-// import wagmiClient from './wagmiClient'
-// import { WagmiProvider  } from 'wagmi';
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 function App() {
+  
+ // Check if wallet is connected when the app loads
+ 
+  
   return (
    <>
-   {/* <WagmiProvider  client={wagmiClient}> */}
    <Fir/>
-   {/* </WagmiProvider> */}
+    <ConnectButton />
    </>
   )
 }

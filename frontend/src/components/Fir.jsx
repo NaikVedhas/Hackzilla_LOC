@@ -1,7 +1,16 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Plus, X, Upload, FileText } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+import { useAccount } from 'wagmi';
+import { ethers } from 'ethers';
+// import { useSigner } from 'wagmi'; // Import the useSigner hook
+// import contractAddress from ""
+
+// import abi from ""
+
+import contractABI from "../abi.json";
+import contractAddress from "../contractAddress";
 
 function CaseFilingForm() {
   const [formData, setFormData] = useState({
@@ -19,51 +28,105 @@ function CaseFilingForm() {
     evidence: [],
     victimGender: "",
     victimAge: "",
-    victimAadharCardNo: "", 
-    witnessAadharCardNo: ""
+    victimAadharCardNo: "",
+    witnessAadharCardNo: "",
   });
 
+  const { address } = useAccount();
 
-  const [AIOutput,setAIOutput]=useState("")
-  const [AISections,setAISections]=useState("")
-
-  console.log(AIOutput,AISections);
-
-const handleGenerateGemini=async()=>{
-    const res=await fetch("http://localhost:3000/api/ipc_section",{
-        method:"POST",
-        headers:{
-            "content-type":"application/json"
-        },
-        body:JSON.stringify({description:formData.description})
-    })
-    console.log(res)
-    const data=await res.json()
-
-    if(data)
-    {
-        setAIOutput(data["reasoning by ai"].replace(/\*+/g, '').trim())
-        setAISections(data['sections'])
-    }
-
-    
-
-  }
-
+  console.log("address",address);
   
+  const [AIOutput, setAIOutput] = useState("");
+  const [AISections, setAISections] = useState("");
+
+  console.log(AIOutput, AISections);
+
+  const handleGenerateGemini = async () => {
+    const res = await fetch("http://localhost:3000/api/ipc_section", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ description: formData.description }),
+    });
+    console.log(res);
+    const data = await res.json();
+
+    if (data) {
+      setAIOutput(data["reasoning by ai"].replace(/\*+/g, "").trim());
+      setAISections(data["sections"]);
+    }
+  };
 
   const { mutate, isLoading } = useMutation({
     mutationFn: async (data) => {
-      const response = await axios.post("http://localhost:5000/api/v1/fir/file", data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await axios.post(
+        "http://localhost:5000/api/v1/fir/file",
+        data,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
       return response.data;
     },
-    onSuccess: (data)=>{
+    onSuccess: (data) => {
       console.log(data);
-      
-    }
+      sendToBlockchain(data);
+    },
   });
+
+  const sendToBlockchain = async (data) => {
+    
+    // console.log("account",account);
+    
+  if (!address) {
+    console.error("No account connected");
+    return;
+  }
+
+
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+
+  const contract = new ethers.Contract(contractAddress, contractABI, signer);
+    
+      const crimeSection = Array.isArray(data.crimeSection) && data.crimeSection.length > 0
+      ? data.crimeSection.join(",") // Join array elements into a string
+      : "";
+
+    // Format ipfsEvidenceImageHash - Convert array to string or empty string if empty
+    const ipfsEvidenceImageHash = Array.isArray(data.ipfsEvidenceImageHash) && data.ipfsEvidenceImageHash.length > 0
+      ? data.ipfsEvidenceImageHash.join(",") // Join array elements into a single string (comma-separated)
+      : ""; // Empty string if no data
+    const ipfsEvidenceVideoHash = Array.isArray(data.ipfsEvidenceVideoHash) && data.ipfsEvidenceVideoHash.length > 0
+      ? data.ipfsEvidenceVideoHash.join(",") // Join array elements into a single string (comma-separated)
+      : ""; // Empty string if no data
+
+    try {
+      // Send transaction to store data in the contract
+      const tx = await contract.registerFIR(
+        data.place, 
+        data.dateTime,
+        crimeSection,
+        data.victimDocId, 
+        data.victimAadharCardNo,
+        data.witnessName,
+        data.witnessAadharCardNo,
+        ipfsEvidenceImageHash, 
+        data.descriptionOfCrime,
+        ipfsEvidenceVideoHash, 
+        data.descriptionOfCrime
+      );
+      
+      // Wait for the transaction to be mined
+      await tx.wait();
+      console.log("Transaction successful:", tx);
+    } catch (error) {
+      console.error("Error sending data to blockchain:", error);
+    }
+  };
+  
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -120,7 +183,7 @@ const handleGenerateGemini=async()=>{
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Combine date and time into a single string
     const dateTime = `${formData.date} ${formData.time}`;
 
@@ -159,19 +222,21 @@ const handleGenerateGemini=async()=>{
     }
   };
 
-  useEffect(()=>{
-    if(AISections)
-    {
-        setFormData(prev => ({
-            ...prev,
-            sections: AISections // Assuming AISections is an array
-          }));
+  useEffect(() => {
+    if (AISections) {
+      setFormData((prev) => ({
+        ...prev,
+        sections: AISections, // Assuming AISections is an array
+      }));
     }
-  },[AISections])
+  }, [AISections]);
 
   return (
     <div className="w-[100vw] flex items-center min-h-screen bg-gray-900 p-6">
-      <form onSubmit={handleSubmit} className="max-w-7xl mx-auto bg-gray-800 rounded-lg shadow-xl overflow-hidden">
+      <form
+        onSubmit={handleSubmit}
+        className="max-w-7xl mx-auto bg-gray-800 rounded-lg shadow-xl overflow-hidden"
+      >
         <div className="p-6">
           <h1 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-purple-400 via-pink-500 to-purple-600 text-transparent bg-clip-text">
             Police Case Filing Form
@@ -182,7 +247,9 @@ const handleGenerateGemini=async()=>{
             <div className="space-y-6">
               {/* Crime Description */}
               <div className="relative">
-                <label className="block text-purple-300 mb-2">Description of Incident/Crime</label>
+                <label className="block text-purple-300 mb-2">
+                  Description of Incident/Crime
+                </label>
                 <textarea
                   name="description"
                   value={formData.description}
@@ -191,22 +258,39 @@ const handleGenerateGemini=async()=>{
                   placeholder="Provide detailed description of the incident..."
                 />
                 <div className="flex absolute right-2 bottom-5 items-center">
-                    <button type='button' className='' onClick={handleGenerateGemini}>G</button>
-                    <p className='mx-3 border-1 border-white px-[10px] py-[1px] rounded-full text-white' title={AIOutput!==""?AIOutput:"Please enter Description"}>i</p>
-                    {/* <Popup/> */}
+                  <button
+                    type="button"
+                    className=""
+                    onClick={handleGenerateGemini}
+                  >
+                    G
+                  </button>
+                  <p
+                    className="mx-3 border-1 border-white px-[10px] py-[1px] rounded-full text-white"
+                    title={
+                      AIOutput !== "" ? AIOutput : "Please enter Description"
+                    }
+                  >
+                    i
+                  </p>
+                  {/* <Popup/> */}
                 </div>
               </div>
 
               {/* Sections of Penal Code */}
               <div>
-                <label className="block text-purple-300 mb-2">Sections of Penal Code</label>
+                <label className="block text-purple-300 mb-2">
+                  Sections of Penal Code
+                </label>
                 <div className="space-y-3">
                   {formData.sections.map((section, index) => (
                     <div key={index} className="flex gap-2">
                       <input
                         type="text"
                         value={section}
-                        onChange={(e) => handleSectionChange(index, e.target.value)}
+                        onChange={(e) =>
+                          handleSectionChange(index, e.target.value)
+                        }
                         placeholder="e.g., IPC 234"
                         className="flex-1 bg-gray-700 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
                       />
@@ -286,7 +370,9 @@ const handleGenerateGemini=async()=>{
               {/* Complainant Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-purple-300 mb-2">Complainant Name</label>
+                  <label className="block text-purple-300 mb-2">
+                    Complainant Name
+                  </label>
                   <input
                     type="text"
                     name="complainantName"
@@ -296,7 +382,9 @@ const handleGenerateGemini=async()=>{
                   />
                 </div>
                 <div>
-                  <label className="block text-purple-300 mb-2">Complainant Phone</label>
+                  <label className="block text-purple-300 mb-2">
+                    Complainant Phone
+                  </label>
                   <input
                     type="tel"
                     name="complainantPhone"
@@ -310,7 +398,9 @@ const handleGenerateGemini=async()=>{
               {/* Witness Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-purple-300 mb-2">Witness Name</label>
+                  <label className="block text-purple-300 mb-2">
+                    Witness Name
+                  </label>
                   <input
                     type="text"
                     name="witnessName"
@@ -320,7 +410,9 @@ const handleGenerateGemini=async()=>{
                   />
                 </div>
                 <div>
-                  <label className="block text-purple-300 mb-2">Witness Phone</label>
+                  <label className="block text-purple-300 mb-2">
+                    Witness Phone
+                  </label>
                   <input
                     type="tel"
                     name="witnessPhone"
@@ -334,7 +426,9 @@ const handleGenerateGemini=async()=>{
               {/* Victim Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-purple-300 mb-2">Victim Gender</label>
+                  <label className="block text-purple-300 mb-2">
+                    Victim Gender
+                  </label>
                   <input
                     type="text"
                     name="victimGender"
@@ -344,7 +438,9 @@ const handleGenerateGemini=async()=>{
                   />
                 </div>
                 <div>
-                  <label className="block text-purple-300 mb-2">Victim Age</label>
+                  <label className="block text-purple-300 mb-2">
+                    Victim Age
+                  </label>
                   <input
                     type="number"
                     name="victimAge"
@@ -356,7 +452,9 @@ const handleGenerateGemini=async()=>{
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-purple-300 mb-2">Victim Aadhar Card No</label>
+                  <label className="block text-purple-300 mb-2">
+                    Victim Aadhar Card No
+                  </label>
                   <input
                     type="text"
                     name="victimAadharCardNo"
@@ -366,7 +464,9 @@ const handleGenerateGemini=async()=>{
                   />
                 </div>
                 <div>
-                  <label className="block text-purple-300 mb-2">Witness Aadhar Card No</label>
+                  <label className="block text-purple-300 mb-2">
+                    Witness Aadhar Card No
+                  </label>
                   <input
                     type="text"
                     name="witnessAadharCardNo"
@@ -384,7 +484,9 @@ const handleGenerateGemini=async()=>{
             <div className="flex items-center gap-4">
               {/* Profile Picture */}
               <div>
-                <label className="block text-purple-300 mb-2">Profile Picture</label>
+                <label className="block text-purple-300 mb-2">
+                  Profile Picture
+                </label>
                 <input
                   type="file"
                   name="profilePicture"
@@ -395,7 +497,9 @@ const handleGenerateGemini=async()=>{
 
               {/* Evidence Images */}
               <div className="space-y-2">
-                <label className="block text-purple-300 mb-2">Evidence Images</label>
+                <label className="block text-purple-300 mb-2">
+                  Evidence Images
+                </label>
                 <input
                   type="file"
                   name="evidenceImages"
