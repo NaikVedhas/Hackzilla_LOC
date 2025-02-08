@@ -1,9 +1,9 @@
 const express = require('express');
 const {fileFir} = require('../controllers/FirController');
 
-const router = express.router();
+const router = express.Router();
 
-router.post("/file",fileFir);
+router.post("/file",upload.single("image"),fileFir);
 
 
 module.exports = router;
