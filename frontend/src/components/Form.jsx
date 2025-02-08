@@ -1,22 +1,32 @@
-import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
-import axios from 'axios';
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import axios from "axios";
+import { PlusCircle, X } from "lucide-react";
 
 const CrimeForm = () => {
   const [formData, setFormData] = useState({
-    descriptionOfCrime: '',
-    place: '',
-    crimeAct: '',
-    crimeSection: '',
-    dateTime: '',
-    victimName: '',
-    victimGender: '',
-    victimAge: '',
-    witnessName: '',
-    witnessAge: '',
-    witnessGender: '',
-    image: null,
+    descriptionOfCrime: "",
+    place: "",
+    dateTime: "",
+    victimName: "",
+    victimGender: "",
+    victimAge: "",
+    witnesses: [],
+    suspects: [],
+    selectedTags: [],
+    victimImage: null,
+    evidenceImage: null,
+    evidenceVideo: null,
   });
+
+  const penalCodes = [
+    "Section 302 - Murder",
+    "Section 307 - Attempted Murder",
+    "Section 379 - Theft",
+    "Section 392 - Robbery",
+    "Section 420 - Cheating",
+    "Section 509 - Insulting modesty",
+  ];
 
   const { mutate } = useMutation({
     mutationFn: async (data) => {
@@ -31,54 +41,122 @@ const CrimeForm = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleImageChange = (e) => {
-    setFormData({ ...formData, image: e.target.files[0] });
+  const handleFileChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.files[0] });
+  };
+
+  const toggleTag = (code) => {
+    setFormData((prev) => ({
+      ...prev,
+      selectedTags: prev.selectedTags.includes(code)
+        ? prev.selectedTags.filter((tag) => tag !== code)
+        : [...prev.selectedTags, code],
+    }));
+  };
+
+  const addEntry = (field) => {
+    setFormData({ ...formData, [field]: [...formData[field], ""] });
+  };
+
+  const removeEntry = (field, index) => {
+    setFormData({ ...formData, [field]: formData[field].filter((_, i) => i !== index) });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const submissionData = new FormData();
     Object.keys(formData).forEach((key) => {
-      submissionData.append(key, formData[key]);
+      if (Array.isArray(formData[key])) {
+        submissionData.append(key, JSON.stringify(formData[key]));
+      } else {
+        submissionData.append(key, formData[key]);
+      }
     });
     mutate(submissionData);
   };
 
   return (
-    <div className="form-container">
-      <h1 className="text-3xl font-bold mb-6">Crime Report Form</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {[
-          { label: "Description of Crime", name: "descriptionOfCrime" },
-          { label: "Place", name: "place" },
-          { label: "Crime Act", name: "crimeAct" },
-          { label: "Crime Section", name: "crimeSection" },
-          { label: "Date and Time", name: "dateTime", type: "datetime-local" },
-          { label: "Victim Name", name: "victimName" },
-          { label: "Victim Gender", name: "victimGender" },
-          { label: "Victim Age", name: "victimAge", type: "number" },
-          { label: "Witness Name", name: "witnessName" },
-          { label: "Witness Gender", name: "witnessGender" },
-          { label: "Witness Age", name: "witnessAge", type: "number" },
-        ].map(({ label, name, type = "text" }) => (
-          <div key={name} className="form-group">
-            <label>{label}:</label>
-            <input
-              type={type}
-              name={name}
-              value={formData[name]}
+    <div className="min-h-screen bg-gray-900 text-gray-100 p-8 flex justify-center">
+      <div className="max-w-3xl w-full bg-gray-800 p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold text-purple-400 mb-6">File an FIR</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block font-medium">Description</label>
+            <textarea
+              name="descriptionOfCrime"
+              className="w-full bg-gray-700 rounded p-2 border border-purple-500"
+              value={formData.descriptionOfCrime}
               onChange={handleChange}
-              className="input-field"
-              required
             />
           </div>
-        ))}
-        <div className="form-group">
-          <label>Upload Image:</label>
-          <input type="file" onChange={handleImageChange} className="input-field" required />
-        </div>
-        <button type="submit" className="submit-btn mt-6">Submit Report</button>
-      </form>
+          <div>
+            <label className="block font-medium">Place of Crime</label>
+            <input
+              type="text"
+              name="place"
+              className="w-full bg-gray-700 rounded p-2 border border-purple-500"
+              value={formData.place}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label className="block font-medium">Date & Time</label>
+            <input
+              type="datetime-local"
+              name="dateTime"
+              className="w-full bg-gray-700 rounded p-2 border border-purple-500"
+              value={formData.dateTime}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label className="block font-medium">Applicable Sections</label>
+            <div className="flex flex-wrap gap-2">
+              {penalCodes.map((code, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => toggleTag(code)}
+                  className={`px-3 py-1 rounded text-sm border border-purple-500 transition ${
+        formData.selectedTags.includes(code) ? "bg-purple-600 text-white" : "bg-gray-700 text-gray-300"}`}
+                >
+                  {code}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <h3 className="font-semibold text-purple-400">Witnesses</h3>
+            {formData.witnesses.map((_, index) => (
+              <div key={index} className="flex gap-2 items-center">
+                <input
+                  type="text"
+                  placeholder="Witness Name"
+                  className="w-full bg-gray-700 rounded p-2 border border-purple-500"
+                  onChange={(e) => {
+                    const newWitnesses = [...formData.witnesses];
+                    newWitnesses[index] = e.target.value;
+                    setFormData({ ...formData, witnesses: newWitnesses });
+                  }}
+                />
+                <button type="button" onClick={() => removeEntry("witnesses", index)}>
+                  <X className="text-red-400" />
+                </button>
+              </div>
+            ))}
+            <button type="button" onClick={() => addEntry("witnesses")} className="text-purple-400 mt-2">
+              <PlusCircle /> Add Witness
+            </button>
+          </div>
+          <div>
+            <h3 className="font-semibold text-purple-400">Upload Evidence</h3>
+            <input type="file" name="victimImage" onChange={handleFileChange} className="block text-gray-300" />
+            <input type="file" name="evidenceImage" onChange={handleFileChange} className="block text-gray-300 mt-2" />
+            <input type="file" name="evidenceVideo" onChange={handleFileChange} className="block text-gray-300 mt-2" />
+          </div>
+          <button type="submit" className="w-full bg-purple-500 text-white py-2 rounded-lg">Submit FIR</button>
+        </form>
+      </div>
     </div>
   );
 };

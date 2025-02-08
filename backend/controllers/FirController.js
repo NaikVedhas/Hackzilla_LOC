@@ -97,7 +97,6 @@ const fileFir = async (req, res) => {
 
       }
 
-
     } catch (error) {
       console.log("Error in MongoDb",error.message);
       return res.status(500).json({message:"Server Error bro"})
@@ -106,6 +105,8 @@ const fileFir = async (req, res) => {
 
     try {
       //Send data to blockchain
+
+      
 
     } catch (error) {
       
