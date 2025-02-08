@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Plus, X, Upload, FileText } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
@@ -19,9 +19,38 @@ function CaseFilingForm() {
     evidence: [],
     victimGender: "",
     victimAge: "",
-    victimAadharCardNo: "",
+    victimAadharCardNo: "", 
     witnessAadharCardNo: ""
   });
+
+
+  const [AIOutput,setAIOutput]=useState("")
+  const [AISections,setAISections]=useState("")
+
+  console.log(AIOutput,AISections);
+
+const handleGenerateGemini=async()=>{
+    const res=await fetch("http://localhost:3000/api/ipc_section",{
+        method:"POST",
+        headers:{
+            "content-type":"application/json"
+        },
+        body:JSON.stringify({description:formData.description})
+    })
+    console.log(res)
+    const data=await res.json()
+
+    if(data)
+    {
+        setAIOutput(data["reasoning by ai"].replace(/\*+/g, '').trim())
+        setAISections(data['sections'])
+    }
+
+    
+
+  }
+
+  
 
   const { mutate, isLoading } = useMutation({
     mutationFn: async (data) => {
@@ -124,11 +153,21 @@ function CaseFilingForm() {
 
     // Submit the form data
     try {
-      const response = await mutate(formDataToSend);
+      await mutate(formDataToSend);
     } catch (error) {
       console.error("Error submitting form:", error);
     }
   };
+
+  useEffect(()=>{
+    if(AISections)
+    {
+        setFormData(prev => ({
+            ...prev,
+            sections: AISections // Assuming AISections is an array
+          }));
+    }
+  },[AISections])
 
   return (
     <div className="w-[100vw] flex items-center min-h-screen bg-gray-900 p-6">
@@ -142,7 +181,7 @@ function CaseFilingForm() {
             {/* Left Column */}
             <div className="space-y-6">
               {/* Crime Description */}
-              <div>
+              <div className="relative">
                 <label className="block text-purple-300 mb-2">Description of Incident/Crime</label>
                 <textarea
                   name="description"
@@ -151,6 +190,11 @@ function CaseFilingForm() {
                   className="w-full h-40 bg-gray-700 text-white rounded-lg p-3 focus:ring-2 focus:ring-purple-500 focus:outline-none"
                   placeholder="Provide detailed description of the incident..."
                 />
+                <div className="flex absolute right-2 bottom-5 items-center">
+                    <button type='button' className='' onClick={handleGenerateGemini}>G</button>
+                    <p className='mx-3 border-1 border-white px-[10px] py-[1px] rounded-full text-white' title={AIOutput!==""?AIOutput:"Please enter Description"}>i</p>
+                    {/* <Popup/> */}
+                </div>
               </div>
 
               {/* Sections of Penal Code */}
