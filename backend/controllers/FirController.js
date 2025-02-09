@@ -157,4 +157,26 @@ const fileFir = async (req, res) => {
   }
 };
 
-module.exports = { fileFir, upload };
+const getEvidence = async (req, res) => {
+  try {
+    const { documentId } = req.query; // Retrieve the documentId from the query parameters
+
+    // Find the evidence document by the given documentId
+    const evidenceDoc = await Evidence.findById(documentId);
+
+    if (!evidenceDoc) {
+      return res.status(404).json({ message: 'Evidence document not found' });
+    }
+
+    // Return the hash (image or video link) to the frontend
+    res.status(200).json({hash: evidenceDoc.hash});
+  } catch (error) {
+    console.error('Error fetching evidence:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'An error occurred while fetching the evidence',
+    });
+  }
+};
+
+module.exports = { fileFir, upload,getEvidence };

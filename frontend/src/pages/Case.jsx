@@ -6,9 +6,8 @@ import contractAddress from "../contractAddress";
 import { ethers } from "ethers";
 import { useAccount } from 'wagmi';
 
-
 function FirListing() {
-  const {id} = useParams();  // Get case ID from URL
+  const { id } = useParams();  // Get case ID from URL
 
   const [cases, setCases] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,38 +30,33 @@ function FirListing() {
     const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
     try {
-        console.log(id);
-        console.log(0);
-        console.log("0");
-
-        
       const caseData = await contract.getCase(id);  // Fetch data for the case with id
-        console.log(caseData);
-        
+      console.log(caseData);
+
       const fetchedCases = [
         {
           id,
-          district: caseData.place,  // Assuming the place in blockchain is like district
-          description: caseData.crimeDescription,  // Crime description from blockchain
-          sections: [caseData.crimeSection],  // Crime sections (we can fetch this via API)
-          province: "Metropolitan",  // Assuming we have predefined provinces
-          date: caseData.timeDate.split(' ')[0],  // Example: Split date and time
-          time: caseData.timeDate.split(' ')[1],  // Example: Split date and time
+          district: "Metropolitan District",  // Hardcoded district data
+          description: "I'm stabbed",  // Hardcoded crime description
+          sections: ["IPC 302", "IPC 376"],  // Hardcoded crime sections
+          province: "Metropolitan",  // Hardcoded province
+          date: "2025-02-09",  // Hardcoded date
+          time: "12:00 PM",  // Hardcoded time
+          victimId: "V12345",  // Hardcoded victim ID
           complainant: {
-            name: address,  // Assuming the address is the complainant
-            phone: "555-1234",  // Placeholder phone, could be fetched or added manually
+            name: "John Doe",  // Hardcoded complainant name
+            phone: "1234567890",  // Hardcoded complainant phone
           },
-          witnesses: caseData.witnessName.map((name, index) => ({
-            name,
-            phone: "555-100" + (index + 1),
-            aadharNo: caseData.witnessAadharNumber[index],
-          })),
           victim: {
-            gender: "Male",  // Placeholder, could be fetched or added manually
-            age: 45,  // Placeholder, could be fetched or added manually
-            aadharNo: caseData.victimAadharNumber,
+            gender: "Male",  // Hardcoded victim gender
+            age: 30,  // Hardcoded victim age
+            aadharNo: "1234-5678-9876",  // Hardcoded victim Aadhar number
           },
-          evidence: caseData.evidenceImages,  // Assuming IPFS hashes for images
+          evidence: [
+            "https://www.livelaw.in/cms/wp-content/uploads/2016/05/Homelessness-and-Crime.jpg",
+            "https://media.istockphoto.com/id/1363488987/photo/detective-board-with-fingerprints-photos-map-and-clues-connected-by-red-string-on-white-brick.jpg?s=612x612&w=0&k=20&c=tM-x3PB-_hP7kVY5CBf3uPt2doTDrgkut-euQx_IjIk="
+          ],
+          witnesses: [],
         },
       ];
 
@@ -227,27 +221,23 @@ function FirListing() {
                     <div className="bg-[#2e2e2e]/50 p-4 rounded-lg">
                       <div className="flex justify-between items-center mb-3">
                         <h3 className="text-lg font-semibold">Evidence</h3>
-                        <button
-                          onClick={() => {
-                            setSelectedCaseId(case_.id);
-                            setShowEvidenceModal(true);
-                          }}
-                          className="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-md transition-colors"
-                        >
-                          Add Evidence
-                        </button>
                       </div>
                       {case_.evidence.length === 0 ? (
                         <p className="text-gray-400">No evidence recorded</p>
                       ) : (
                         <div className="grid grid-cols-2 gap-4">
                           {case_.evidence.map((url, index) => (
-                            <img
-                              key={index}
-                              src={url}
-                              alt={`Evidence ${index + 1}`}
-                              className="w-full h-48 object-cover rounded-lg"
-                            />
+                            <div key={index} className="relative">
+                              <img
+                                src={url}
+                                alt={`Evidence ${index + 1}`}
+                                className="w-full h-48 object-cover rounded-lg"
+                                onError={(e) => {
+                                  e.target.onerror = null; // Prevent infinite loop in case of broken link
+                                  e.target.src = "https://via.placeholder.com/150"; // Placeholder image if the image fails to load
+                                }}
+                              />
+                            </div>
                           ))}
                         </div>
                       )}
@@ -255,98 +245,9 @@ function FirListing() {
                   </div>
                 </div>
               ))
-          )
-            }
+          )}
         </div>
       </div>
-
-      {/* Modal for Witness and Evidence */}
-      {/* Witness Modal */}
-      {showWitnessModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-[#2e2e2e] p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-4">Add New Witness</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Name</label>
-                <input
-                  type="text"
-                  value={newWitness.name}
-                  onChange={(e) => setNewWitness({...newWitness, name: e.target.value})}
-                  className="w-full px-3 py-2 bg-[#1e1e1e] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Phone</label>
-                <input
-                  type="text"
-                  value={newWitness.phone}
-                  onChange={(e) => setNewWitness({...newWitness, phone: e.target.value})}
-                  className="w-full px-3 py-2 bg-[#1e1e1e] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Aadhar No.</label>
-                <input
-                  type="text"
-                  value={newWitness.aadharNo}
-                  onChange={(e) => setNewWitness({...newWitness, aadharNo: e.target.value})}
-                  className="w-full px-3 py-2 bg-[#1e1e1e] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-              <div className="flex gap-2 justify-end">
-                <button
-                  onClick={() => setShowWitnessModal(false)}
-                  className="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-md transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => selectedCaseId && addWitness(selectedCaseId)}
-                  className="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-md transition-colors"
-                >
-                  Add Witness
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Evidence Modal */}
-      {showEvidenceModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-[#2e2e2e] p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-4">Add New Evidence</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Evidence URL</label>
-                <input
-                  type="text"
-                  value={newEvidence}
-                  onChange={(e) => setNewEvidence(e.target.value)}
-                  placeholder="Enter image URL"
-                  className="w-full px-3 py-2 bg-[#1e1e1e] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-              <div className="flex gap-2 justify-end">
-                <button
-                  onClick={() => setShowEvidenceModal(false)}
-                  className="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-md transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => selectedCaseId && addEvidence(selectedCaseId)}
-                  className="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-md transition-colors"
-                >
-                  Add Evidence
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
