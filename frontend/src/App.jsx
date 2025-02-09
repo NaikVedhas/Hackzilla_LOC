@@ -1,10 +1,13 @@
 import './App.css'
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import toast, { Toaster } from "react-hot-toast";   
 import { createBrowserRouter,Route,createRoutesFromElements,RouterProvider, Navigate } from "react-router"
 import FirForm from "./components/FirForm";
 import NotFound from "./pages/NotFound";
-
+import GeoServices from "./pages/GeoServices";
+import Analytics from "./pages/Analytics";
+import Layout from "./Layout"
+import MyCases from './pages/MyCases';
+import Case from './pages/Case';
 
 function App() {
   
@@ -14,7 +17,8 @@ function App() {
         <Route path='/filecase' element={<FirForm/>} />
         <Route path='/geoservices' element={<GeoServices/>} />
         <Route path='/analytics' element={<Analytics/>} />
-
+        <Route path='/mycases' element={<MyCases/>} />
+        <Route path='/case/:id' element={<Case/>} />
         <Route path='*' element={<NotFound/>} />
         
       </Route>

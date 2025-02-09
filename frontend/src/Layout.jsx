@@ -1,18 +1,17 @@
-import {Outlet} from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar";
-
 import ScrollToTop from "./ScrollToTop";
 
-//Aded scroll to top so that when u go from one page to aother u go at the top of another page
-function Layout () {
-
-    return (
-        <>
-        <ScrollToTop/>
-        <Navbar/>
-        <Outlet/>
-        </>
-    )
+function Layout() {
+  return (
+    <>
+      <ScrollToTop />
+      <Navbar />
+      <div className="pt-[70px]"> {/* Adjust padding to match the height of the navbar */}
+        <Outlet />
+      </div>
+    </>
+  );
 }
 
 export default Layout;
