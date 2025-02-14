@@ -71,7 +71,7 @@ const Dashboard = () => {
   const COLORS = ['#9333ea', '#a855f7', '#c084fc', '#d8b4fe', '#e9d5ff', '#f3e8ff', '#8b5cf6', '#7c3aed', '#6d28d9', '#5b21b6', '#4c1d95'];
 
   const StatCard = ({ icon: Icon, title, value }) => (
-    <div className="bg-gray-800 rounded-lg p-6 border border-purple-500">
+    <div className="bg-[#131313] rounded-lg p-6 ">
       <div className="flex items-center">
         <div className="rounded-full p-3 bg-purple-500/10">
           <Icon className="h-8 w-8 text-purple-500" />
@@ -84,7 +84,7 @@ const Dashboard = () => {
     </div>
   );
   return (
-    <div className="min-h-screen bg-gray-900 p-8">
+    <div className="min-h-screen bg-[#000000] p-8">
       <h1 className="text-3xl font-bold mb-8 text-white">Police Department Analytics Dashboard</h1>
       
       {/* Summary Cards */}
@@ -98,7 +98,7 @@ const Dashboard = () => {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* District Performance Chart */}
-        <div className="bg-gray-800 rounded-lg p-6 border border-purple-500">
+        <div className="bg-[#131313] rounded-lg p-6 ">
           <h2 className="text-xl font-bold mb-4 text-white">District-wise Performance</h2>
           <div className="h-96">
             <ResponsiveContainer width="100%" height="100%">
@@ -119,7 +119,7 @@ const Dashboard = () => {
         </div>
 
         {/* Rank Distribution Chart */}
-        <div className="bg-gray-800 rounded-lg p-6 border border-purple-500">
+        <div className="bg-[#131313] rounded-lg p-6 ">
           <h2 className="text-xl font-bold mb-4 text-white">Rank Distribution</h2>
           <div className="h-96">
             <ResponsiveContainer width="100%" height="100%">

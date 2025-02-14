@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Shield, MessageSquare, AlertTriangle, FileText, ArrowLeft, Send, Search } from 'lucide-react';
 
-// Dummy data for police stations
 const stations = [
   { id: 1, name: "Samtanagar Police Station", district: "Mumbai" },
   { id: 2, name: "Bandra Police Station", district: "Mumbai" },
@@ -9,7 +8,6 @@ const stations = [
   { id: 4, name: "Juhu Police Station", district: "Mumbai" }
 ];
 
-// Dummy data for case files
 const caseFiles = [
   {
     id: 1,
@@ -178,7 +176,7 @@ function Chatapp() {
           </div>
         ) : (
           <div className="h-[calc(100vh-12rem)] flex flex-col bg-[#000000] rounded-lg overflow-hidden">
-            <div className="p-4 bg-gray-750 flex items-center gap-4">
+            <div className="p-4 bg-[#131313] flex items-center gap-4">
               <button
                 onClick={() => setSelectedStation(null)}
                 className="p-2 hover:bg-gray-700 rounded-full transition-colors"

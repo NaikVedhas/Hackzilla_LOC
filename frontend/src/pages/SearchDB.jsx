@@ -40,23 +40,23 @@ const DatabaseIntegration = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 p-8">
+    <div className="min-h-screen bg-[#000000] text-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
           <Database className="w-8 h-8 text-purple-400" />
-          <h1 className="text-2xl font-bold">Government Database Integration</h1>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 text-transparent bg-clip-text">Government Database Integration</h1>
         </div>
 
         {/* Search Form */}
-        <form onSubmit={handleSearch} className="bg-gray-800 rounded-lg p-6 mb-8">
+        <form onSubmit={handleSearch} className="bg-[#232323] rounded-lg p-6 mb-8">
           <div className="grid gap-6 md:grid-cols-2">
             <div>
               <label className="block text-sm font-medium mb-2">Search Type</label>
               <select
                 value={searchType}
                 onChange={(e) => setSearchType(e.target.value)}
-                className="w-full bg-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full bg-[#131313] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value="criminal">Criminal Records</option>
                 <option value="warrants">Active Warrants</option>
@@ -73,7 +73,7 @@ const DatabaseIntegration = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Enter search criteria..."
-                  className="w-full bg-gray-700 rounded-md pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full bg-[#131313] rounded-md pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
                 <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
               </div>

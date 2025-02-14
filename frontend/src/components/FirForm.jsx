@@ -4,9 +4,11 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useAccount } from 'wagmi';
 import { ethers } from 'ethers';
-
+import { useNavigate } from "react-router-dom";
 import contractABI from "../abi.json";
 import contractAddress from "../contractAddress";
+import {WandSparkles} from"lucide-react"
+import toast from "react-hot-toast";
 
 function CaseFilingForm() {
   const [formData, setFormData] = useState({
@@ -27,7 +29,7 @@ function CaseFilingForm() {
     victimAadharCardNo: "",
     witnessAadharCardNo: "",
   });
-
+  const navigate = useNavigate(); // Initialize useNavigate
   const { address } = useAccount();
 
   console.log("address",address);
@@ -49,6 +51,9 @@ function CaseFilingForm() {
     const data = await res.json();
 
     if (data) {
+      toast("Analysis Done \n\ Check  reasoning",{
+        icon:'💥'
+      });
       setAIOutput(data["reasoning by ai"].replace(/\*+/g, "").trim());
       setAISections(data["sections"]);
     }
@@ -116,6 +121,7 @@ function CaseFilingForm() {
       
       // Wait for the transaction to be mined
       await tx.wait();
+      navigate('/');
       console.log("Transaction successful:", tx);
     } catch (error) {
       console.error("Error sending data to blockchain:", error);
@@ -180,6 +186,9 @@ function CaseFilingForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    toast.loading("Loading",{
+      duration:8000,
+    })
     // Combine date and time into a single string
     const dateTime = `${formData.date} ${formData.time}`;
 
@@ -228,7 +237,7 @@ function CaseFilingForm() {
   }, [AISections]);
 
   return (
-    <div className="w-[100vw] flex items-center min-h-screen bg-gray-900 p-6">
+    <div className="w-[100vw] flex items-center min-h-screen  p-6">
       <form
         onSubmit={handleSubmit}
         className="max-w-7xl mx-auto bg-gray-800 rounded-lg shadow-xl overflow-hidden"
@@ -256,10 +265,10 @@ function CaseFilingForm() {
                 <div className="flex absolute right-2 bottom-5 items-center">
                   <button
                     type="button"
-                    className=""
+                    className="w-[30px] h-[30px] bg-black rounded-2xl"
                     onClick={handleGenerateGemini}
                   >
-                    G
+                    <WandSparkles />
                   </button>
                   <p
                     className="mx-3 border-1 border-white px-[10px] py-[1px] rounded-full text-white"

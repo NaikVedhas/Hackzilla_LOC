@@ -612,7 +612,7 @@ function ShiftListing() {
             <div className="relative">
               <button
                 onClick={() => setShowSortMenu(!showSortMenu)}
-                className="px-4 py-2 h-[50px] bg-gray-800 rounded-lg flex items-center gap-2 hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 h-[50px] bg-[#232323] rounded-lg flex items-center gap-2 hover:bg-gray-700 transition-colors"
               >
                 Sort by
                 <ChevronDown className="w-4 h-4" />

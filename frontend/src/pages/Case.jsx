@@ -29,6 +29,8 @@ function FirListing() {
     const signer = provider.getSigner();
     const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
+
+    //Always ethers ka version yeh rakhna - "ethers": "^5.7.2",
     try {
       const caseData = await contract.getCase(id);  // Fetch data for the case with id
       console.log(caseData);
@@ -36,27 +38,27 @@ function FirListing() {
       const fetchedCases = [
         {
           id,
-          district: "Metropolitan District",  // Hardcoded district data
-          description: "I'm stabbed",  // Hardcoded crime description
-          sections: ["IPC 302", "IPC 376"],  // Hardcoded crime sections
-          province: "Metropolitan",  // Hardcoded province
-          date: "2025-02-09",  // Hardcoded date
-          time: "12:00 PM",  // Hardcoded time
-          victimId: "V12345",  // Hardcoded victim ID
+          district: caseData.district || "Metropolitan District",  // Fallback to hardcoded district data if empty
+          description: caseData.description || "In a school 8 year old boy wasa serouously ragged by his classmates. He was locked in classroom the whole night and he committed suicide due to stress",  // Fallback to hardcoded crime description if empty
+          sections: caseData.sections?.length > 0 ? caseData.sections : ["IPC 302", "IPC 376"],  // Fallback to hardcoded sections if empty
+          province: caseData.province || "Metropolitan",  // Fallback to hardcoded province if empty
+          date: caseData.date || "2025-02-09",  // Fallback to hardcoded date if empty
+          time: caseData.time || "12:00 PM",  // Fallback to hardcoded time if empty
+          victimId: caseData.victimId || "V12345",  // Fallback to hardcoded victim ID if empty
           complainant: {
-            name: "John Doe",  // Hardcoded complainant name
-            phone: "1234567890",  // Hardcoded complainant phone
+            name: caseData.complainant?.name || "Manish ",  // Fallback to hardcoded complainant name if empty
+            phone: caseData.complainant?.phone || "9405713751",  // Fallback to hardcoded complainant phone if empty
           },
           victim: {
-            gender: "Male",  // Hardcoded victim gender
-            age: 30,  // Hardcoded victim age
-            aadharNo: "1234-5678-9876",  // Hardcoded victim Aadhar number
+            gender: caseData.victim?.gender || "Male",  // Fallback to hardcoded victim gender if empty
+            age: caseData.victim?.age || 20,  // Fallback to hardcoded victim age if empty
+            aadharNo: caseData.victim?.aadharNo || "1344-5128-9876",  // Fallback to hardcoded victim Aadhar number if empty
           },
-          evidence: [
+          evidence: caseData.evidence?.length > 0 ? caseData.evidence : [
             "https://www.livelaw.in/cms/wp-content/uploads/2016/05/Homelessness-and-Crime.jpg",
             "https://media.istockphoto.com/id/1363488987/photo/detective-board-with-fingerprints-photos-map-and-clues-connected-by-red-string-on-white-brick.jpg?s=612x612&w=0&k=20&c=tM-x3PB-_hP7kVY5CBf3uPt2doTDrgkut-euQx_IjIk="
-          ],
-          witnesses: [],
+          ],  // Fallback to hardcoded evidence if empty
+          witnesses: caseData.witnesses?.length > 0 ? caseData.witnesses : [],  // Fallback to empty array if no witnesses
         },
       ];
 

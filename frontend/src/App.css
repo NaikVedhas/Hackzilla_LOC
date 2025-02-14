@@ -2,3 +2,10 @@
 {
     /* font-size: 20px; */
 }
+
+body
+{
+    background-color: #000000;
+    overflow-x: hidden;
+    color: #ffffff;
+}
