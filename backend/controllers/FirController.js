@@ -134,7 +134,7 @@ const fileFir = async (req, res) => {
       return res.status(500).json({ message: "Server Error when saving to MongoDB" });
     }
 
-    console.log("DONE SUCCESS");
+    console.log("DONE SUCCES");
     
     // Send a success response with the collected data
     res.status(200).json({
