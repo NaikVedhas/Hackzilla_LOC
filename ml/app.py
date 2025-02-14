@@ -7,7 +7,7 @@ import time
 import math
 
 app = Flask(__name__)
-GOOGLE_MAPS_API_KEY = 'AIzaSyDbIWEmQPWwh_TRoShN7OwBycu3nlm-tWE'  # Replace with actual key
+GOOGLE_MAPS_API_KEY = ''  # Replace with actual key
 
 # Initial data
 incidents = [

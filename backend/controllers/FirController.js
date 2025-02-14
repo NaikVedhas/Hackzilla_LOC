@@ -4,7 +4,6 @@ const FormData = require("form-data");
 const fs = require("fs");
 const Victim = require("../models/VictimModel");
 const Evidence = require("../models/EvidenceModel");
-const { log } = require("console");
 
 require("dotenv").config();
 
