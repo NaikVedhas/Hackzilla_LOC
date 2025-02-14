@@ -31,6 +31,7 @@ function FirListing() {
 
 
     //Always ethers ka version yeh rakhna - "ethers": "^5.7.2",
+    
     try {
       const caseData = await contract.getCase(id);  // Fetch data for the case with id
       console.log(caseData);

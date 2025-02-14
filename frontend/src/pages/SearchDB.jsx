@@ -18,14 +18,6 @@ const DatabaseIntegration = () => {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // This is where you would make your actual API call
-      // const response = await fetch(`your-authorized-api-endpoint`, {
-      //   headers: {
-      //     'Authorization': 'Bearer your-auth-token',
-      //     'Content-Type': 'application/json',
-      //   }
-      // });
-      
       // Simulated response
       setResults({
         status: 'SUCCESS',

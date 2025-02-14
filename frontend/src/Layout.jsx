@@ -7,7 +7,7 @@ function Layout() {
     <>
       <ScrollToTop />
       <Navbar />
-      <div className="pt-[70px]"> {/* Adjust padding to match the height of the navbar */}
+      <div className="pt-[70px]"> 
         <Outlet />
       </div>
     </>

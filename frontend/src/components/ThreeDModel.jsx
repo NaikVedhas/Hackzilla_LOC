@@ -1,5 +1,3 @@
-import Spline from "@splinetool/react-spline";
-import gsap from 'gsap'
 
 export default function ThreeDModel() {
   return (

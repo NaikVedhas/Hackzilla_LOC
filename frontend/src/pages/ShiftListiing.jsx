@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Shield, Search, Settings, ChevronDown, X } from 'lucide-react';
 
-// Dummy data for initial officers
 const initialOfficers = [
   {
       "id": 1,
@@ -518,14 +517,6 @@ const initialOfficers = [
       ]
       
     ];
-
-// useEffect(()=>{
-//   let fetchData=async()=>{
-//       const res=await fetch('http://localhost:5000/get-officers')
-//       const data=await res.json() 
-//   }
-//   fetchData()
-// },[])
 
 function ShiftListing() {
   const [officers, setOfficers] = useState(initialOfficers);

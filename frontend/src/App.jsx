@@ -1,6 +1,6 @@
 import './App.css'
-import toast, { Toaster } from "react-hot-toast";   
-import { createBrowserRouter,Route,createRoutesFromElements,RouterProvider, Navigate } from "react-router"
+import { Toaster } from "react-hot-toast";   
+import { createBrowserRouter,Route,createRoutesFromElements,RouterProvider } from "react-router"
 import FirForm from "./components/FirForm";
 import NotFound from "./pages/NotFound";
 import GeoServices from "./pages/GeoServices";

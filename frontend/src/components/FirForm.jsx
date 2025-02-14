@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, X, Upload, FileText } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useAccount } from 'wagmi';
@@ -32,12 +32,10 @@ function CaseFilingForm() {
   const navigate = useNavigate(); // Initialize useNavigate
   const { address } = useAccount();
 
-  console.log("address",address);
   
   const [AIOutput, setAIOutput] = useState("");
   const [AISections, setAISections] = useState("");
 
-  console.log(AIOutput, AISections);
 
   const handleGenerateGemini = async () => {
     const res = await fetch("http://localhost:3000/api/ipc_section", {
@@ -77,8 +75,6 @@ function CaseFilingForm() {
   });
 
   const sendToBlockchain = async (data) => {
-    
-    // console.log("account",account);
     
   if (!address) {
     console.error("No account connected");

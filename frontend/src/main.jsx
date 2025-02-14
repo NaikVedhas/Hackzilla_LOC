@@ -12,7 +12,7 @@ const queryClient = new QueryClient();
 
 const config = getDefaultConfig({
   appName: "loc7",
-  projectId: "59738a3aed3d161d34bda195475becbe",
+  projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID,
   chains: [sepolia, mainnet, polygon],
   // ssr: true, // If your dApp uses server side rendering (SSR)
 });
